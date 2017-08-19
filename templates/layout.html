@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% block head %}
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+                  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+                  crossorigin="anonymous">
+            <script src="https://use.fontawesome.com/da795d2700.js"></script>
+        {% endblock %}
+    </head>
+    <header>{% include "header.html" %}</header>
+    <body>
+        <div id="content">{% block content %}{% endblock %}</div>
+    </body>
+    <footer>{% include "footer.html" %}</footer>
+</html>
