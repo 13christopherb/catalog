@@ -1,14 +1,14 @@
 import sys
 from flask import Flask
-from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///catalog.db'
 db = SQLAlchemy(app)
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
