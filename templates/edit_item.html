@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+    {{ item.name }}<br>
+    {{ item.quantity }}
+    <form method=post>
+        {{ form.name(class_="form-control") }}
+        {{ form.quantity(class_="form-control") }}
+        <button type=submit class="btn btn-success btn-sm">
+            <i class="fa fa-plus-square" aria-hidden="true"></i> Add Item
+        </button>
+    </form>
+{% endblock %}

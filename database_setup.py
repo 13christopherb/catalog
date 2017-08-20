@@ -1,28 +1,13 @@
 import sys
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
+from models import db
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///catalog.db'
-db = SQLAlchemy(app)
 
 
-class User(UserMixin, db.Model):
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-
-    items = db.relationship('Item', backref='user',
-                            lazy='dynamic')
-
-
-class Item(db.Model):
-    __tablename__ = 'item'
-    name = db.Column(db.String(100), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    category = db.Column(db.String(20))
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-db.create_all()
+if __name__ == '__main__':
+    db.init_app(app)
+    db.app = app
+    db.create_all()

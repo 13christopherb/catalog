@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% block content %}
+    {{ item.name }}<br>
+    {{ item.quantity }}
+    <a href="{{ url_for('edit_item', obj_id=item.id) }}">Edit</a>
+{% endblock %}
