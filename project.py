@@ -1,6 +1,8 @@
-from flask import Flask, session, render_template, request, redirect, jsonify, url_for, flash, escape
+from flask import Flask, session, render_template,\
+     request, redirect, jsonify, url_for, flash, escape
 from flask_oauth import OAuth
-from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
+from flask_login import LoginManager, UserMixin, login_user,\
+     logout_user, current_user
 
 from forms import ItemForm
 
@@ -27,14 +29,16 @@ lm = LoginManager(app)
 oauth = OAuth()
 
 facebook = oauth.remote_app('facebook',
-    base_url='https://graph.facebook.com/',
-    request_token_url=None,
-    access_token_url='/oauth/access_token',
-    authorize_url='https://www.facebook.com/dialog/oauth',
-    consumer_key=FACEBOOK_APP_ID,
-    consumer_secret=FACEBOOK_APP_SECRET,
-    request_token_params={'scope': 'email'}
-)
+                            base_url='https://graph.facebook.com/',
+                            request_token_url=None,
+                            access_token_url='/oauth/access_token',
+                            authorize_url='https://www.facebook.com'
+                                          '/dialog/oauth',
+                            consumer_key=FACEBOOK_APP_ID,
+                            consumer_secret=FACEBOOK_APP_SECRET,
+                            request_token_params={'scope': 'email'}
+                            )
+
 
 @lm.user_loader
 def load_user(id):
@@ -43,7 +47,7 @@ def load_user(id):
 
 @app.route('/')
 def index():
-    return render_template('index.html', current_user = current_user)
+    return render_template('index.html', current_user=current_user)
 
 
 # Displays all the items belonging to the current user
@@ -74,8 +78,10 @@ def login():
     if not current_user.is_anonymous:
         return redirect(url_for('index'))
     return facebook.authorize(callback=url_for('facebook_authorized',
-                                               next=request.args.get('next') or request.referrer or None,
+                                               next=request.args.get('next') or
+                                               request.referrer or None,
                                                _external=True))
+
 
 @app.route('/logout')
 def logout():
