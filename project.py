@@ -137,7 +137,6 @@ def view_item(obj_id):
         return abort(403)
 
 
-# Creates a new item belonging to current user
 @app.route('/new_item', methods=['GET', 'POST'])
 @login_required
 def new_item():
@@ -201,7 +200,7 @@ def edit_item(obj_id):
         return abort(403)
 
 
-"""Login/logout using facebook oauth2"""
+#Login/logout using facebook oauth2
 
 
 @app.route('/login')
@@ -251,6 +250,12 @@ def get_facebook_oauth_token():
 
 @app.route('/api/v1.0/item/<obj_id>', methods=['GET'])
 def get_item(obj_id):
+    """
+    Returns a json object representing an item
+    
+    :param obj_id: id for item to be returned
+    :return: json representation of item
+    """
     item = Item.query.filter_by(id=obj_id).first()
     return jsonify(item.serialize)
 
