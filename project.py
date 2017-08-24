@@ -65,7 +65,7 @@ def index():
 def create_category(name):
     """
     Creates a category if it does not exist or fetches existing category
-    
+
     :param name: name of the category
     :return: the category with the provided name
     """
@@ -88,7 +88,7 @@ def create_category(name):
 def inventory(filter):
     """
     Function for viewing and adding items to a user
-    
+
     :param filter: optional string from url to filter items by name
     """
     form = ItemForm(request.form)
@@ -120,7 +120,7 @@ def inventory(filter):
 def view_item(obj_id):
     """
     Function for viewing a specific item
-    
+
     :param obj_id: the id of the item to be viewed
     """
     item = Item.query.filter_by(id=obj_id).first()
@@ -160,6 +160,7 @@ def new_item():
 def delete_item(obj_id):
     """
     Function for deleting a specific item
+
     :param obj_id: id of item to be deleted
     """
     item = Item.query.filter_by(id=obj_id).first()
@@ -178,7 +179,7 @@ def delete_item(obj_id):
 def edit_item(obj_id):
     """
     Function for editing a specific item if it exists
-    
+
     :param obj_id: id of item to be edited
     """
     item = Item.query.filter_by(id=obj_id).first()
@@ -200,8 +201,7 @@ def edit_item(obj_id):
         return abort(403)
 
 
-#Login/logout using facebook oauth2
-
+# Login/logout using facebook oauth2
 
 @app.route('/login')
 def login():
@@ -252,7 +252,7 @@ def get_facebook_oauth_token():
 def get_item(obj_id):
     """
     Returns a json object representing an item
-    
+
     :param obj_id: id for item to be returned
     :return: json representation of item
     """

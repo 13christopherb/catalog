@@ -4,9 +4,11 @@ from flask_login import UserMixin
 db = SQLAlchemy()
 
 categories = db.Table('categories',
-                      db.Column('category_id', db.Integer, db.ForeignKey('category.id')),
-                      db.Column('item_id', db.Integer, db.ForeignKey('item.id'))
-)
+                      db.Column('category_id', db.Integer,
+                                db.ForeignKey('category.id')),
+                      db.Column('item_id', db.Integer,
+                                db.ForeignKey('item.id'))
+                      )
 
 
 class User(UserMixin, db.Model):
@@ -33,7 +35,7 @@ class Item(db.Model):
     def serialize(self):
         """
         Serializes the Item to a JSON object
-        
+
         :return: JSON representation of the item
         """
         categories = []
@@ -49,7 +51,7 @@ class Item(db.Model):
     def add_category(self, category):
         """
         Adds a category to the item's list of categories
-        
+
         :param category: The category to be added
         """
         self.categories.append(category)
