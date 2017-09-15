@@ -22,6 +22,7 @@ class User(UserMixin, db.Model):
 
 class Item(db.Model):
     """Represents an item in an inventory"""
+
     __tablename__ = 'item'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -38,6 +39,7 @@ class Item(db.Model):
 
         :return: JSON representation of the item
         """
+
         categories = []
         for category in self.categories:
             categories.append(category.name)
@@ -54,6 +56,7 @@ class Item(db.Model):
 
         :param category: The category to be added
         """
+
         self.categories.append(category)
         return self
 

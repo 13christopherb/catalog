@@ -22,7 +22,7 @@ SECRET_KEY = 'development key'
 """Initialization and configuration"""
 app = Flask(__name__)
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///catalog.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///catalog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = SECRET_KEY
 
@@ -50,7 +50,6 @@ def load_user(id):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        print('test')
         if current_user.is_anonymous:
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
@@ -91,6 +90,7 @@ def inventory(filter):
 
     :param filter: optional string from url to filter items by name
     """
+
     form = ItemForm(request.form)
 
     if request.method == 'POST' and form.validate():
@@ -123,6 +123,7 @@ def view_item(obj_id):
 
     :param obj_id: the id of the item to be viewed
     """
+
     item = Item.query.filter_by(id=obj_id).first()
     if item is None:
         return redirect(url_for('inventory'))
@@ -137,24 +138,6 @@ def view_item(obj_id):
         return abort(403)
 
 
-@app.route('/new_item', methods=['GET', 'POST'])
-@login_required
-def new_item():
-    """Function for creating a new item belonging to the current user"""
-    form = ItemForm(request.form)
-    if request.method == 'POST' and form.validate():
-        item = Item(name=form.name.data, quantity=form.quantity.data,
-                    user_id=current_user.id)
-        category = Category(name=form.category.data)
-        item.add_category(category)
-        db.session.add(item)
-        db.session.add(category)
-        db.session.commit()
-        flash('Thanks for registering')
-        return redirect(url_for('index'))
-    return render_template('new_item.html', form=form)
-
-
 @app.route('/delete_item/<obj_id>', methods=['GET'])
 @login_required
 def delete_item(obj_id):
@@ -163,7 +146,8 @@ def delete_item(obj_id):
 
     :param obj_id: id of item to be deleted
     """
-    item = Item.query.filter_by(id=obj_id).first()
+
+    item = Item.query.filter_by(id=obj_id).one_or_none()
     if item.user_id == current_user.id:
         """Delete category if item to be deleted is only item in category"""
         for category in item.categories:
@@ -174,6 +158,22 @@ def delete_item(obj_id):
     return redirect(url_for('inventory'))
 
 
+@app.route('/remove_category/<item_id>/<category_id>', methods=['GET', 'POST'])
+@login_required
+def remove_category(item_id, category_id):
+    item = Item.query.filter_by(id=item_id).one_or_none()
+    category = Category.query.filter_by(id=category_id).one_or_none()
+    if item.user_id == current_user.id:
+        item.remove_category(category)
+        # Deletes unused category
+        if len(category.items.all()) == 0:
+            db.session.delete(category)
+            db.session.commit()
+        return redirect(url_for('view_item', obj_id=item.id))
+    else:
+        return abort(403)
+
+
 @app.route('/edit_item/<obj_id>', methods=['GET', 'POST'])
 @login_required
 def edit_item(obj_id):
@@ -182,16 +182,19 @@ def edit_item(obj_id):
 
     :param obj_id: id of item to be edited
     """
+
     item = Item.query.filter_by(id=obj_id).first()
     form = ItemForm(request.form)
     if item is None:
         return redirect(url_for('inventory'))
     if item.user_id == current_user.id:
         if request.method == 'POST':
-            item.name = form.name.data
-            item.quantity = form.quantity.data
+            if form.name.data:
+                item.name = form.name.data
+            if form.quantity.data is not None:
+                item.quantity = form.quantity.data
             category = create_category(form.category.data.lower())
-            if category not in item.categories:
+            if category not in item.categories and form.category.data:
                 item.add_category(category)
 
             db.session.commit()
@@ -206,6 +209,7 @@ def edit_item(obj_id):
 @app.route('/login')
 def login():
     """Logs in user if not logged in"""
+
     if not current_user.is_anonymous:
         return redirect(url_for('index'))
     return facebook.authorize(callback=url_for('facebook_authorized',
@@ -218,6 +222,7 @@ def login():
 @login_required
 def logout():
     """Logs user out if logged in"""
+
     logout_user()
     return redirect(url_for('index'))
 
@@ -232,7 +237,7 @@ def facebook_authorized(resp):
         )
     session['oauth_token'] = (resp['access_token'], '')
     me = facebook.get('/me')
-    user = User.query.filter_by(name=me.data['name']).first()
+    user = User.query.filter_by(name=me.data['name']).one_or_none()
     if not user:
         user = User(name=me.data['name'])
         db.session.add(user)
@@ -256,7 +261,8 @@ def get_item(obj_id):
     :param obj_id: id for item to be returned
     :return: json representation of item
     """
-    item = Item.query.filter_by(id=obj_id).first()
+
+    item = Item.query.filter_by(id=obj_id).one_or_none()
     return jsonify(item.serialize)
 
 if __name__ == '__main__':
